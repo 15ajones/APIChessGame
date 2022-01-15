@@ -3,8 +3,10 @@ this file is responsible for handling user input and displaying the current game
 
 """
 import ChessEngine
+import chess
+
 import pygame as p
-WIDTH = HEIGHT = 512
+WIDTH = HEIGHT = 512 # of chess board
 DIMENSION = 8
 SQ_SIZE = HEIGHT // DIMENSION
 MAX_FPS = 15
@@ -39,6 +41,11 @@ def main():
         for e in p.event.get():
             if e.type == p.QUIT:
                 running = False
+            elif e.type == p.MOUSEBUTTONDOWN:
+                location = p.mouse.get_pos() #gets location of mouse click
+                row = location[0]//SQ_SIZE
+                column = location[1]//SQ_SIZE
+
         drawGameState(screen,gs)
         clock.tick(MAX_FPS)
         p.display.flip()
