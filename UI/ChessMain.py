@@ -6,7 +6,7 @@ import pygame as p
 WIDTH = HEIGHT = 512 # of chess board
 DIMENSION = 8
 SQ_SIZE = HEIGHT // DIMENSION
-MAX_FPS = 15
+MAX_FPS = 30
 IMAGES = {}
 ROW_INDEXER = {
     0: "a",
@@ -46,6 +46,7 @@ def main():
     load_images()
     running = True
     move_array=[]
+    game_over=False
     move = ""
     row = column = half_move = 0
     while running:
@@ -87,8 +88,24 @@ def main():
         pygame_board = translate_board(game) #need to change so its different if youre black or if youre white
         drawGameState(screen,pygame_board)
         highlightSquares(screen, game,pygame_board,half_move,row,column,move_array)
+        if game.board.is_checkmate():
+            game_over=True
+            if game.turn_white:
+                drawText(screen, "Black wins by checkmate!")
+            else:
+                drawText(screen, "White wins by checkmate!")
+        elif game.board.is_game_over():
+            game_over=True
+            drawText(screen, "Draw!")
         clock.tick(MAX_FPS)
         p.display.flip()
+
+
+def drawText(screen, text):
+    font = p.font.SysFont("Helvitca", 32, True, False)
+    textObject = font.render(text, 0, p.Color('Black'))
+    textLocation = p.Rect(0,0,WIDTH, HEIGHT).move(WIDTH/2 -textObject.get_width()/2, HEIGHT/2 - textObject.get_height()/2)
+    screen.blit(textObject, textLocation)
 
 def translate_board(game):
     pygame_board = [
