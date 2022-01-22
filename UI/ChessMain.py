@@ -59,6 +59,7 @@ def main():
                     if len(move_array)==0:
                         move_array.append(half_move)
                         print("1")
+                        
                     elif len(move_array)==1:
                         if half_move == move_array[0]:
                             move_array=[] #cancels move
@@ -69,7 +70,13 @@ def main():
                             if chess.Move.from_uci(move) in game.board.legal_moves:
                                 game.board.push(chess.Move.from_uci(move))
                                 game.turn_white = not game.turn_white
-                            move_array=[]
+                                move_array=[]
+                            else:
+                                move_array=[]
+                                move_array.append(half_move)
+
+
+                            
             else:
                 move=game.engine.play(game.board, chess.engine.Limit(time=0.1)).move
                 print(move)
@@ -77,6 +84,7 @@ def main():
                 game.turn_white = not game.turn_white  
         pygame_board = translate_board(game) #need to change so its different if youre black or if youre white
         drawGameState(screen,pygame_board)
+        highlightSquares(screen, game, row=None, column=None, half_move=None)
         clock.tick(MAX_FPS)
         p.display.flip()
 
@@ -99,7 +107,22 @@ def translate_board(game):
             pygame_board[row].append(str(game.board)[i])
     return pygame_board
 
-        
+def highlightSquares(screen, game,row,column,half_move):
+    if half_move != None:
+        return
+
+    piece = str(game.board)[game.board_indexer[(str(half_move))[0]]+int((str(half_move))[1])]
+    if piece ==".":
+        return    
+    if (game.turn_white and piece.isupper()) or (not game.turn_white and piece.islower()):
+        s = p.Surface((SQ_SIZE, SQ_SIZE))
+        s.set_alpha(100)
+        s.fill(p.Color('blue'))
+        screen.blit(s, (column*SQ_SIZE, row*SQ_SIZE))
+
+
+
+    
 
 
 def drawGameState(screen,board):#responsible for all chess graphics
@@ -107,6 +130,7 @@ def drawGameState(screen,board):#responsible for all chess graphics
     drawPieces(screen,board) 
 
 def drawBoard(screen):#this function draws squares on the board
+    global colors
     colors = [p.Color("white"), p.Color("gray")]
     white = False
     for i in range(DIMENSION):
@@ -125,6 +149,8 @@ def drawPieces(screen,board):#this function draws pieces on top of those squares
             piece = board[i][j]
             if piece != ".":
                 screen.blit(IMAGES[piece], p.Rect(j*SQ_SIZE, i*SQ_SIZE, SQ_SIZE, SQ_SIZE))
+
+
 
 if __name__ == "__main__":
     main()
