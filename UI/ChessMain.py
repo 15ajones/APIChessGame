@@ -77,17 +77,12 @@ def main():
                             move=str(move_array[0])+str(move_array[1])
                             if chess.Move.from_uci(move) in game.board.legal_moves:
                                 game.board.push(chess.Move.from_uci(move))
-                                t1 = time.time()-t0
-                                if game.turn_white:
-                                    white_time+=t1
-                                else:
-                                    black_time+=t1
-                                t0 = time.time()
                                 game.turn_white = not game.turn_white
                                 move_array=[]
                             else:
                                 move_array=[]
                                 move_array.append(half_move)
+                
 
 
                             
@@ -95,7 +90,11 @@ def main():
             #     move=game.engine.play(game.board, chess.engine.Limit(time=0.1)).move
             #     print(move)
             #     game.board.push(move)
-            #     game.turn_white = not game.turn_white  
+            #     game.turn_white = not game.turn_white
+        if game.turn_white:
+            white_time+=0.0666667
+        else:
+            black_time+=0.0666667
         pygame_board = translate_board(game) #need to change so its different if youre black or if youre white
         drawGameState(screen,pygame_board)
         highlightSquares(screen, game,pygame_board,half_move,row,column,move_array)
@@ -109,6 +108,8 @@ def main():
         elif game.board.is_game_over():
             game_over=True
             drawText(screen, "Draw!")
+        elif game_over:
+            drawText(screen, "TIMEOUT")
         clock.tick(MAX_FPS)
         p.display.flip()
 
@@ -117,15 +118,16 @@ def drawTimer(screen, white_time, black_time):
     color = colors[1]
     p.draw.rect(screen,color,p.Rect(8*DIMENSION+448, 0, 300, HEIGHT/2))
     font = p.font.SysFont('arial', 80, True, False)
-    
     color = colors[0]
     p.draw.rect(screen, color, p.Rect(8*DIMENSION+448, HEIGHT/2, 300, HEIGHT/2))
-    black_time_text = str(int(black_time))
-    textObject = font.render(black_time_text, 0, p.Color("Black"))
+    black_countdown = 300-int(black_time)
+    black_time_text = str(black_countdown//60)+":"+str(black_countdown%60) if len(str(black_countdown%60))>1 else str(black_countdown//60)+":"+"0"+str(black_countdown%60)
+    textObject = font.render(black_time_text if black_countdown > 0 else "0", 0, p.Color("Black"))
     textLocation = p.Rect(8*DIMENSION+448, 0, 300, HEIGHT/2).move(WIDTH/3 - textObject.get_width()/2, HEIGHT/4 - textObject.get_height()/2)
     screen.blit(textObject, textLocation)
-    white_time_text = str(int(white_time))
-    textObject = font.render(white_time_text, 0, p.Color("Black"))
+    white_countdown = 300-int(white_time)
+    white_time_text = str(white_countdown//60)+":"+str(white_countdown%60) if len(str(white_countdown%60))>1 else str(white_countdown//60)+":"+"0"+str(white_countdown%60)
+    textObject = font.render(white_time_text if white_countdown > 0 else "0", 0, p.Color("Black"))
     textLocation = p.Rect(8*DIMENSION+448, HEIGHT/2, 300, HEIGHT/2).move(WIDTH/3 - textObject.get_width()/2, HEIGHT/4 - textObject.get_height()/2)
     screen.blit(textObject, textLocation)
     
