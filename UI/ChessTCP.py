@@ -18,7 +18,6 @@ ROW_INDEXER = {
     6: "g",
     7: "h" 
 }
-
 #gunna initialise a global dictionary of images once (only once cos its a costly process)
 
 def load_images():
@@ -39,6 +38,7 @@ def load_images():
 
 def main():
     p.init()
+    
     screen = p.display.set_mode((WIDTH, HEIGHT))
     clock = p.time.Clock()
     screen.fill(p.Color("white"))
@@ -47,7 +47,6 @@ def main():
     running = True
     move_array=[]
     move = ""
-    row = column = half_move = 0
     while running:
         for e in p.event.get():
             if e.type == p.QUIT:
@@ -61,7 +60,6 @@ def main():
                     if len(move_array)==0:
                         move_array.append(half_move)
                         print("1")
-                        
                     elif len(move_array)==1:
                         if half_move == move_array[0]:
                             move_array=[] #cancels move
@@ -72,13 +70,7 @@ def main():
                             if chess.Move.from_uci(move) in game.board.legal_moves:
                                 game.board.push(chess.Move.from_uci(move))
                                 game.turn_white = not game.turn_white
-                                move_array=[]
-                            else:
-                                move_array=[]
-                                move_array.append(half_move)
-
-
-                            
+                            move_array=[]
             else:
                 move=game.engine.play(game.board, chess.engine.Limit(time=0.1)).move
                 print(move)
@@ -86,7 +78,6 @@ def main():
                 game.turn_white = not game.turn_white  
         pygame_board = translate_board(game) #need to change so its different if youre black or if youre white
         drawGameState(screen,pygame_board)
-        highlightSquares(screen, game,pygame_board,half_move,row,column,move_array)
         clock.tick(MAX_FPS)
         p.display.flip()
 
@@ -109,30 +100,14 @@ def translate_board(game):
             pygame_board[row].append(str(game.board)[i])
     return pygame_board
 
-def highlightSquares(screen, game,pygame_board,half_move=None, row=None, column=None,move_array=None):#highlights piece currently selected
-    if (half_move == None) or (half_move == 0):
-        return
-    if len(move_array)!=1:
-        return
-
-    piece = pygame_board[column][row]
-    if piece ==".":
-        return    
-    if (game.turn_white and piece.isupper()) or (not game.turn_white and piece.islower()):
-        s = p.Surface((SQ_SIZE, SQ_SIZE))
-        s.set_alpha(100)
-        s.fill(p.Color('blue'))
-        screen.blit(s, (row*SQ_SIZE, column*SQ_SIZE))
+        
 
 
-
-    
 def drawGameState(screen,board):#responsible for all chess graphics
     drawBoard(screen) 
     drawPieces(screen,board) 
 
 def drawBoard(screen):#this function draws squares on the board
-    global colors
     colors = [p.Color("white"), p.Color("gray")]
     white = False
     for i in range(DIMENSION):
@@ -152,7 +127,10 @@ def drawPieces(screen,board):#this function draws pieces on top of those squares
             if piece != ".":
                 screen.blit(IMAGES[piece], p.Rect(j*SQ_SIZE, i*SQ_SIZE, SQ_SIZE, SQ_SIZE))
 
-
-
 if __name__ == "__main__":
     main()
+
+
+
+    
+     
