@@ -18,6 +18,7 @@ ROW_INDEXER = {
     6: "g",
     7: "h" 
 }
+
 #gunna initialise a global dictionary of images once (only once cos its a costly process)
 
 def load_images():
@@ -46,6 +47,7 @@ def main():
     running = True
     move_array=[]
     move = ""
+    row = column = half_move = 0
     while running:
         for e in p.event.get():
             if e.type == p.QUIT:
@@ -84,7 +86,7 @@ def main():
                 game.turn_white = not game.turn_white  
         pygame_board = translate_board(game) #need to change so its different if youre black or if youre white
         drawGameState(screen,pygame_board)
-        highlightSquares(screen, game, row=None, column=None, half_move=None)
+        highlightSquares(screen, game,pygame_board,half_move,row,column,move_array)
         clock.tick(MAX_FPS)
         p.display.flip()
 
@@ -107,24 +109,24 @@ def translate_board(game):
             pygame_board[row].append(str(game.board)[i])
     return pygame_board
 
-def highlightSquares(screen, game,row,column,half_move):
-    if half_move != None:
+def highlightSquares(screen, game,pygame_board,half_move=None, row=None, column=None,move_array=None):#highlights piece currently selected
+    if (half_move == None) or (half_move == 0):
+        return
+    if len(move_array)!=1:
         return
 
-    piece = str(game.board)[game.board_indexer[(str(half_move))[0]]+int((str(half_move))[1])]
+    piece = pygame_board[column][row]
     if piece ==".":
         return    
     if (game.turn_white and piece.isupper()) or (not game.turn_white and piece.islower()):
         s = p.Surface((SQ_SIZE, SQ_SIZE))
         s.set_alpha(100)
         s.fill(p.Color('blue'))
-        screen.blit(s, (column*SQ_SIZE, row*SQ_SIZE))
+        screen.blit(s, (row*SQ_SIZE, column*SQ_SIZE))
 
 
 
     
-
-
 def drawGameState(screen,board):#responsible for all chess graphics
     drawBoard(screen) 
     drawPieces(screen,board) 
@@ -154,8 +156,3 @@ def drawPieces(screen,board):#this function draws pieces on top of those squares
 
 if __name__ == "__main__":
     main()
-
-
-
-    
-     
