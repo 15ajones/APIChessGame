@@ -49,6 +49,7 @@ def main():
     game_over=False
     move = ""
     row = column = half_move = 0
+
     while running:
         for e in p.event.get():
             if e.type == p.QUIT:
