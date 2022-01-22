@@ -1,12 +1,13 @@
 from ChessEngine import Game
 import chess
 import chess.engine
+import time
 
 import pygame as p
 WIDTH = HEIGHT = 512 # of chess board
 DIMENSION = 8
 SQ_SIZE = HEIGHT // DIMENSION
-MAX_FPS = 30
+MAX_FPS = 15
 IMAGES = {}
 ROW_INDEXER = {
     0: "a",
@@ -39,7 +40,7 @@ def load_images():
 
 def main():
     p.init()
-    screen = p.display.set_mode((WIDTH, HEIGHT))
+    screen = p.display.set_mode((WIDTH+300, HEIGHT))
     clock = p.time.Clock()
     screen.fill(p.Color("white"))
     game = Game(True)
@@ -49,12 +50,15 @@ def main():
     game_over=False
     move = ""
     row = column = half_move = 0
-
+    white_time = black_time = 0.0
+    t0 = time.time()
+    white_clock = True
     while running:
         for e in p.event.get():
             if e.type == p.QUIT:
                 running = False
-            elif game.turn_white!=game.robot_white:
+            # elif game.turn_white!=game.robot_white: #uncomment for stockfish black
+            else: #comment for stockfish black
                 if e.type == p.MOUSEBUTTONDOWN:
                     location = p.mouse.get_pos() #gets location of mouse click
                     row = location[0]//SQ_SIZE
@@ -78,17 +82,23 @@ def main():
                             else:
                                 move_array=[]
                                 move_array.append(half_move)
+                
 
 
                             
-            else:
-                move=game.engine.play(game.board, chess.engine.Limit(time=0.1)).move
-                print(move)
-                game.board.push(move)
-                game.turn_white = not game.turn_white  
+            # else: #uncomment for stockfish black
+            #     move=game.engine.play(game.board, chess.engine.Limit(time=0.1)).move
+            #     print(move)
+            #     game.board.push(move)
+            #     game.turn_white = not game.turn_white
+        if game.turn_white:
+            white_time+=0.0666667
+        else:
+            black_time+=0.0666667
         pygame_board = translate_board(game) #need to change so its different if youre black or if youre white
         drawGameState(screen,pygame_board)
         highlightSquares(screen, game,pygame_board,half_move,row,column,move_array)
+        drawTimer(screen, white_time, black_time)
         if game.board.is_checkmate():
             game_over=True
             if game.turn_white:
@@ -98,10 +108,29 @@ def main():
         elif game.board.is_game_over():
             game_over=True
             drawText(screen, "Draw!")
+        elif game_over:
+            drawText(screen, "TIMEOUT")
         clock.tick(MAX_FPS)
         p.display.flip()
 
-
+def drawTimer(screen, white_time, black_time):
+    global colors
+    color = colors[1]
+    p.draw.rect(screen,color,p.Rect(8*DIMENSION+448, 0, 300, HEIGHT/2))
+    font = p.font.SysFont('arial', 80, True, False)
+    color = colors[0]
+    p.draw.rect(screen, color, p.Rect(8*DIMENSION+448, HEIGHT/2, 300, HEIGHT/2))
+    black_countdown = 300-int(black_time)
+    black_time_text = str(black_countdown//60)+":"+str(black_countdown%60) if len(str(black_countdown%60))>1 else str(black_countdown//60)+":"+"0"+str(black_countdown%60)
+    textObject = font.render(black_time_text if black_countdown > 0 else "0", 0, p.Color("Black"))
+    textLocation = p.Rect(8*DIMENSION+448, 0, 300, HEIGHT/2).move(WIDTH/3 - textObject.get_width()/2, HEIGHT/4 - textObject.get_height()/2)
+    screen.blit(textObject, textLocation)
+    white_countdown = 300-int(white_time)
+    white_time_text = str(white_countdown//60)+":"+str(white_countdown%60) if len(str(white_countdown%60))>1 else str(white_countdown//60)+":"+"0"+str(white_countdown%60)
+    textObject = font.render(white_time_text if white_countdown > 0 else "0", 0, p.Color("Black"))
+    textLocation = p.Rect(8*DIMENSION+448, HEIGHT/2, 300, HEIGHT/2).move(WIDTH/3 - textObject.get_width()/2, HEIGHT/4 - textObject.get_height()/2)
+    screen.blit(textObject, textLocation)
+    
 def drawText(screen, text):
     font = p.font.SysFont("Helvitca", 32, True, False)
     textObject = font.render(text, 0, p.Color('Black'))
