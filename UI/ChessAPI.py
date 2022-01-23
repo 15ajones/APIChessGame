@@ -40,7 +40,7 @@ def load_images():
 #this next bit handles uder input and updating of graphics
 
 def main():
-    session = berserk.TokenSession("lip_91oyBEwFziL22bkIG82c")
+    session = berserk.TokenSession("lip_l4z3E18ypBbDwd313T0b")
     client = berserk.Client(session)
     board = berserk.clients.Board(session)
     account_data = client.account.get()
@@ -158,6 +158,7 @@ def main():
 
 def drawTimer(screen, white_time, black_time):
     global colors
+    colors = [p.Color("white"), p.Color("gray")]
     color = colors[1]
     p.draw.rect(screen,color,p.Rect(8*DIMENSION+448, 0, 300, HEIGHT/2))
     font = p.font.SysFont('arial', 80, True, False)
