@@ -40,7 +40,7 @@ def load_images():
 #this next bit handles uder input and updating of graphics
 
 def main():
-    session = berserk.TokenSession("lip_5Od79tnPRcRNlXR3PFn8")
+    session = berserk.TokenSession("lip_25Gz8ZrWIBiKGk9Xuh6R")
     client = berserk.Client(session)
     board = berserk.clients.Board(session)
     account_data = client.account.get()
@@ -84,7 +84,7 @@ def main():
         for e in p.event.get():
             if e.type == p.QUIT:
                 running = False
-            # elif game.turn_white!=game.robot_white: #uncomment for stockfish black
+            
             elif game.turn_white == isWhite:
                 white_time = old_white_time + time.time()-t0   #comment for stockfish black
                 if e.type == p.MOUSEBUTTONDOWN:
@@ -94,7 +94,7 @@ def main():
                     if isWhite:
                         half_move=ROW_INDEXER[row]+str(8-column)
                     else:
-                        half_move=ROW_INDEXER[row]+str(column+1)
+                        half_move=ROW_INDEXER[row]+str(1+column)
                     if len(move_array)==0:
                         move_array.append(half_move)
                         print("1")
@@ -127,8 +127,9 @@ def main():
                     print("here")
                     if event['type']=='gameState':
                         print(event)
-                        if event['status']=='aborted':
+                        if event['status']=='aborted' or event['status']=='resign':
                             game_over=True
+                            print(event['status'])
                             break
                         try:
                             print(str(event["moves"].split()[-1]))
@@ -173,7 +174,7 @@ def drawTimer(screen, white_time, black_time, isWhite):
     if isWhite:
         textLocation = p.Rect(8*DIMENSION+448, 0, 300, HEIGHT/2).move(WIDTH/3 - textObject.get_width()/2, HEIGHT/4 - textObject.get_height()/2)
     else:
-        textLocation = p.Rect(8*DIMENSION+448, HEIGHT/2, 300, HEIGHT/2).move(WIDTH/3 - textObject.get_width()/2, HEIGHT/4 - textObject.get_height()/2)
+        textLocation = p.Rect(8*DIMENSION+448, HEIGHT/2, 300, HEIGHT/2).move(WIDTH/3 - textObject.get_width()/2, HEIGHT/4 - textObject.get_height()/2)    
     screen.blit(textObject, textLocation)
     white_countdown = 600-int(white_time)
     white_time_text = str(white_countdown//60)+":"+str(white_countdown%60) if len(str(white_countdown%60))>1 else str(white_countdown//60)+":"+"0"+str(white_countdown%60)
@@ -217,7 +218,7 @@ def translate_board(game, isWhite):
             elif str(game.board)[i]!=" ":
                 pygame_board[row].append(str(game.board)[i])
         return pygame_board
-
+        
 
 def highlightSquares(screen, game,pygame_board,half_move=None, row=None, column=None,move_array=None):#highlights piece currently selected
     if (half_move == None) or (half_move == 0):
@@ -266,5 +267,4 @@ def drawPieces(screen,board):#this function draws pieces on top of those squares
 
 if __name__ == "__main__":
     main()
-
 
