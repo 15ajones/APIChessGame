@@ -267,4 +267,7 @@ def drawPieces(screen,board):#this function draws pieces on top of those squares
 
 if __name__ == "__main__":
     main()
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
